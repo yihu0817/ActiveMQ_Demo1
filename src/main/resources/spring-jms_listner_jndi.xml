@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd 
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd">
+	<bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/queue/connectionFactory"></property>
+	</bean>
+	<bean id="messageQueue" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/queue/queue0"></property>
+	</bean>
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+		<property name="defaultDestination" ref="messageQueue"></property>
+	</bean>
+	<!-- 消息监听 -->
+	<bean id="listenerContainer"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="messageListener" ref="receiveMessageListener" />
+	</bean>
+	<bean id="messageSender" class="com.warmtel.jms.demo1.consumer.MessageSender">
+		<property name="jmsTemplate" ref="jmsTemplate"></property>
+	</bean>
+
+	<bean id="receiveMessageListener" class="com.warmtel.jms.demo1.consumer.ReceiveMessageListener"></bean>
+
+</beans>
